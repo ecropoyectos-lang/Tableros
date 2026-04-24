@@ -52,7 +52,7 @@
     border-radius: 4px;
   }
 
-  /* ─── CIRCUITOS (posiciones en porcentaje) ─── */
+  /* ─── CIRCUITOS (posiciones serán asignadas por JavaScript) ─── */
   .circuito {
     position: absolute;
     cursor: pointer;
@@ -222,11 +222,10 @@
   ═══════════════════════════════ -->
   <div id="igbox"
        class="circuito grupo neutro"
-       style="top:12%; left:46.5%; width:6.5%; height:8%;"
        onclick="seleccionar('ig','neutro','igbox')"
        title="IG - Interruptor General">
   </div>
-  <div id="ig" class="info" style="top:8%; left:55%;">
+  <div id="ig" class="info">
     <button class="info-close" onclick="cerrar(event)">✕</button>
     <span class="fase-tag tag-n">NEUTRO / GENERAL</span>
     <b>IG — INTERRUPTOR GENERAL</b>
@@ -242,8 +241,8 @@
   <!-- ═══════════════════════════════
        LADO IZQUIERDO: C-1 a C-5
   ═══════════════════════════════ -->
-  <div id="c1box" class="circuito grupo fase-r" style="top:26%; left:29%; width:6%; height:3%;" onclick="seleccionar('c1','fase-r','c1box')" title="C-1"></div>
-  <div id="c1" class="info" style="top:23%; left:5%;">
+  <div id="c1box" class="circuito grupo fase-r" onclick="seleccionar('c1','fase-r','c1box')" title="C-1"></div>
+  <div id="c1" class="info">
     <button class="info-close" onclick="cerrar(event)">✕</button>
     <span class="fase-tag tag-r">FASE R</span>
     <b>C-1 — Riel Din</b>
@@ -251,8 +250,8 @@
     Fase R: 2.5 mm² NH-90<br>Neutro: 2.5 mm² NH-90<br>Tierra: 2.5 mm² NH-90<br>
   </div>
 
-  <div id="c2box" class="circuito grupo fase-s" style="top:29.5%; left:29%; width:6%; height:3%;" onclick="seleccionar('c2','fase-s','c2box')" title="C-2"></div>
-  <div id="c2" class="info" style="top:26.5%; left:5%;">
+  <div id="c2box" class="circuito grupo fase-s" onclick="seleccionar('c2','fase-s','c2box')" title="C-2"></div>
+  <div id="c2" class="info">
     <button class="info-close" onclick="cerrar(event)">✕</button>
     <span class="fase-tag tag-s">FASE S</span>
     <b>C-2 — Riel Din</b>
@@ -260,8 +259,8 @@
     Fase S: 2.5 mm² NH-90<br>Neutro: 2.5 mm² NH-90<br>Tierra: 2.5 mm² NH-90<br>
   </div>
 
-  <div id="c3box" class="circuito grupo fase-t" style="top:33%; left:29%; width:6%; height:3%;" onclick="seleccionar('c3','fase-t','c3box')" title="C-3"></div>
-  <div id="c3" class="info" style="top:30%; left:5%;">
+  <div id="c3box" class="circuito grupo fase-t" onclick="seleccionar('c3','fase-t','c3box')" title="C-3"></div>
+  <div id="c3" class="info">
     <button class="info-close" onclick="cerrar(event)">✕</button>
     <span class="fase-tag tag-t">FASE T</span>
     <b>C-3 — Riel Din</b>
@@ -269,8 +268,8 @@
     Fase T: 4 mm² NH-90<br>Neutro: 4 mm² NH-90<br>Tierra: 2.5 mm² NH-90<br>
   </div>
 
-  <div id="c4box" class="circuito grupo fase-r" style="top:36.5%; left:29%; width:6%; height:3%;" onclick="seleccionar('c4','fase-r','c4box')" title="C-4"></div>
-  <div id="c4" class="info" style="top:33.5%; left:5%;">
+  <div id="c4box" class="circuito grupo fase-r" onclick="seleccionar('c4','fase-r','c4box')" title="C-4"></div>
+  <div id="c4" class="info">
     <button class="info-close" onclick="cerrar(event)">✕</button>
     <span class="fase-tag tag-r">FASE R</span>
     <b>C-4 — Riel Din</b>
@@ -278,8 +277,8 @@
     Fase R: 4 mm² NH-90<br>Neutro: 4 mm² NH-90<br>Tierra: 2.5 mm² NH-90<br>
   </div>
 
-  <div id="c5box" class="circuito grupo fase-s" style="top:40%; left:29%; width:6%; height:3%;" onclick="seleccionar('c5','fase-s','c5box')" title="C-5"></div>
-  <div id="c5" class="info" style="top:37%; left:5%;">
+  <div id="c5box" class="circuito grupo fase-s" onclick="seleccionar('c5','fase-s','c5box')" title="C-5"></div>
+  <div id="c5" class="info">
     <button class="info-close" onclick="cerrar(event)">✕</button>
     <span class="fase-tag tag-s">FASE S</span>
     <b>C-5 — Riel Din</b>
@@ -290,8 +289,8 @@
   <!-- ═══════════════════════════════
        LADO DERECHO: C-6 a C-9
   ═══════════════════════════════ -->
-  <div id="c6box" class="circuito grupo fase-r" style="top:26%; left:67%; width:6%; height:3%;" onclick="seleccionar('c6','fase-r','c6box')" title="C-6"></div>
-  <div id="c6" class="info" style="top:23%; left:74%;">
+  <div id="c6box" class="circuito grupo fase-r" onclick="seleccionar('c6','fase-r','c6box')" title="C-6"></div>
+  <div id="c6" class="info">
     <button class="info-close" onclick="cerrar(event)">✕</button>
     <span class="fase-tag tag-r">FASE R</span>
     <b>C-6 — Riel Din</b>
@@ -299,8 +298,8 @@
     Fase R: 4 mm² NH-90<br>Neutro: 4 mm² NH-90<br>Tierra: 2.5 mm² NH-90<br>
   </div>
 
-  <div id="c7box" class="circuito grupo fase-s" style="top:29.5%; left:67%; width:6%; height:3%;" onclick="seleccionar('c7','fase-s','c7box')" title="C-7"></div>
-  <div id="c7" class="info" style="top:26.5%; left:74%;">
+  <div id="c7box" class="circuito grupo fase-s" onclick="seleccionar('c7','fase-s','c7box')" title="C-7"></div>
+  <div id="c7" class="info">
     <button class="info-close" onclick="cerrar(event)">✕</button>
     <span class="fase-tag tag-s">FASE S</span>
     <b>C-7 — Riel Din</b>
@@ -308,8 +307,8 @@
     Fase S: 4 mm² NH-90<br>Neutro: 4 mm² NH-90<br>Tierra: 2.5 mm² NH-90<br>
   </div>
 
-  <div id="c8box" class="circuito grupo fase-t" style="top:33%; left:67%; width:6%; height:3%;" onclick="seleccionar('c8','fase-t','c8box')" title="C-8"></div>
-  <div id="c8" class="info" style="top:30%; left:74%;">
+  <div id="c8box" class="circuito grupo fase-t" onclick="seleccionar('c8','fase-t','c8box')" title="C-8"></div>
+  <div id="c8" class="info">
     <button class="info-close" onclick="cerrar(event)">✕</button>
     <span class="fase-tag tag-t">FASE T</span>
     <b>C-8 — Riel Din</b>
@@ -317,8 +316,8 @@
     Fase T: 4 mm² NH-90<br>Neutro: 4 mm² NH-90<br>Tierra: 2.5 mm² NH-90<br>
   </div>
 
-  <div id="c9box" class="circuito grupo fase-r" style="top:36.5%; left:67%; width:6%; height:3%;" onclick="seleccionar('c9','fase-r','c9box')" title="C-9"></div>
-  <div id="c9" class="info" style="top:33.5%; left:74%;">
+  <div id="c9box" class="circuito grupo fase-r" onclick="seleccionar('c9','fase-r','c9box')" title="C-9"></div>
+  <div id="c9" class="info">
     <button class="info-close" onclick="cerrar(event)">✕</button>
     <span class="fase-tag tag-r">FASE R</span>
     <b>C-9 — Riel Din</b>
@@ -335,6 +334,77 @@
   const hint = document.getElementById('hint');
   let circuitoActivo = null;
 
+  // ──────────────────────────────────────────────
+  // CONFIGURACIÓN DE POSICIONES (EN PIXELES ORIGINALES)
+  // Basado en imagen de 1000px de ancho
+  // ──────────────────────────────────────────────
+  const posiciones = {
+    igbox: { top: 120, left: 465, width: 65, height: 80 },
+    c1box: { top: 260, left: 290, width: 60, height: 30 },
+    c2box: { top: 295, left: 290, width: 60, height: 30 },
+    c3box: { top: 330, left: 290, width: 60, height: 30 },
+    c4box: { top: 365, left: 290, width: 60, height: 30 },
+    c5box: { top: 400, left: 290, width: 60, height: 30 },
+    c6box: { top: 260, left: 670, width: 60, height: 30 },
+    c7box: { top: 295, left: 670, width: 60, height: 30 },
+    c8box: { top: 330, left: 670, width: 60, height: 30 },
+    c9box: { top: 365, left: 670, width: 60, height: 30 }
+  };
+
+  const posicionesInfo = {
+    ig: { top: 80, left: 550 },
+    c1: { top: 248, left: 55 },
+    c2: { top: 283, left: 55 },
+    c3: { top: 318, left: 55 },
+    c4: { top: 353, left: 55 },
+    c5: { top: 388, left: 55 },
+    c6: { top: 248, left: 738 },
+    c7: { top: 283, left: 738 },
+    c8: { top: 318, left: 738 },
+    c9: { top: 353, left: 738 }
+  };
+
+  // Función para actualizar todas las posiciones según el tamaño actual de la imagen
+  function actualizarPosiciones() {
+    const img = document.querySelector('.tablero-img');
+    if (!img.complete || img.naturalWidth === 0) {
+      // Si la imagen no está cargada, esperar
+      setTimeout(actualizarPosiciones, 100);
+      return;
+    }
+
+    // Obtener el tamaño REAL actual de la imagen en pantalla
+    const imgRect = img.getBoundingClientRect();
+    
+    // Calcular la escala actual (ancho actual / ancho original)
+    // Asumimos que el ancho original de diseño es 1000px
+    const escalaX = imgRect.width / 1000;
+    const escalaY = imgRect.height / img.naturalHeight;
+    
+    // Actualizar posición de cada circuito
+    for (const [id, pos] of Object.entries(posiciones)) {
+      const elemento = document.getElementById(id);
+      if (elemento) {
+        elemento.style.top = (pos.top * escalaY) + 'px';
+        elemento.style.left = (pos.left * escalaX) + 'px';
+        elemento.style.width = (pos.width * escalaX) + 'px';
+        elemento.style.height = (pos.height * escalaY) + 'px';
+      }
+    }
+    
+    // Actualizar posición de los paneles de información
+    for (const [id, pos] of Object.entries(posicionesInfo)) {
+      const elemento = document.getElementById(id);
+      if (elemento) {
+        elemento.style.top = (pos.top * escalaY) + 'px';
+        elemento.style.left = (pos.left * escalaX) + 'px';
+      }
+    }
+  }
+
+  // ──────────────────────────────────────────────
+  // FUNCIONES DE SELECCIÓN
+  // ──────────────────────────────────────────────
   function seleccionar(infoId, fase, boxId) {
     const mismoClic = (boxId === circuitoActivo);
     resetear();
@@ -378,6 +448,7 @@
     return colores[fase] || '#ffffff';
   }
 
+  // Evento: clic fuera de los circuitos para deseleccionar
   contenedor.addEventListener('click', function(e) {
     if (!e.target.closest('.circuito') && !e.target.closest('.info')) {
       resetear();
@@ -385,14 +456,30 @@
     }
   });
 
-  // Verificar si la imagen se carga
+  // ──────────────────────────────────────────────
+  // INICIALIZACIÓN Y EVENTOS DE RESIZE
+  // ──────────────────────────────────────────────
   window.addEventListener('load', function() {
+    actualizarPosiciones();
+    
+    // Verificar si la imagen se carga correctamente
     const img = document.querySelector('.tablero-img');
     img.onerror = function() {
       console.error('❌ No se pudo cargar tablero.png');
-      alert('⚠️ Error: No encuentro la imagen "tablero.png"\n\nAsegúrate de que:\n1. El archivo está en la misma carpeta\n2. El nombre es exactamente "tablero.png"');
+      alert('⚠️ Error: No encuentro la imagen "tablero.png"\n\nAsegúrate de que:\n1. El archivo está en la misma carpeta\n2. El nombre es exactamente "tablero.png" (minúsculas)');
     };
   });
+  
+  // Actualizar posiciones cuando se redimensione la ventana (ej: rotar el celular)
+  window.addEventListener('resize', function() {
+    setTimeout(actualizarPosiciones, 100);
+  });
+  
+  // También actualizar cuando la imagen termine de cargar
+  const img = document.querySelector('.tablero-img');
+  if (img) {
+    img.addEventListener('load', actualizarPosiciones);
+  }
 </script>
 
 </body>
