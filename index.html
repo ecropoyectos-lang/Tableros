@@ -2,326 +2,380 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tablero Interactivo TG</title>
-
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    background: #1a1a2e;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px 16px 40px;
-    font-family: 'Courier New', Courier, monospace;
-    min-height: 100vh;
-  }
+body {
+  background: #1a1a2e;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 12px 60px;
+  font-family: 'Courier New', Courier, monospace;
+  min-height: 100vh;
+}
 
-  h2 {
-    color: #e0e6f0;
-    font-size: clamp(0.9rem, 4vw, 1.1rem);
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.12);
-    padding-bottom: 10px;
-    width: 100%;
-    max-width: 600px;
-    text-align: center;
-  }
+h2 {
+  color: #e0e6f0;
+  font-size: clamp(0.7rem, 3.5vw, 1.05rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  padding-bottom: 10px;
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+}
 
-  #tablero-container {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-    line-height: 0;
-  }
+#tablero-container {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 0;
+}
 
-  .tablero-img {
-    display: block;
-    width: 100%;
-    height: auto;
-    user-select: none;
-    border-radius: 4px;
-  }
+.tablero-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+  border-radius: 4px;
+}
 
-  .circuito {
-    position: absolute;
-    cursor: pointer;
-    border-radius: 3px;
-    z-index: 5;
-    transition: opacity 0.35s ease, box-shadow 0.35s ease;
-    opacity: 1;
-  }
+/*
+  CIRCUITOS: las posiciones inline en el HTML son la base a 600px.
+  El JS las escala con ResizeObserver al ancho real del contenedor.
+*/
+.circuito {
+  position: absolute;
+  cursor: pointer;
+  border-radius: 3px;
+  z-index: 5;
+  transition: opacity 0.35s ease, box-shadow 0.35s ease, filter 0.25s ease;
+}
 
-  #tablero-container.hay-seleccion .grupo {
-    opacity: 0.12;
-    filter: grayscale(60%);
-  }
+#tablero-container.hay-seleccion .grupo        { opacity: 0.12; filter: grayscale(60%); }
+#tablero-container.hay-seleccion .grupo.activo { opacity: 1;    filter: grayscale(0%);  }
+#igbox { opacity: 1 !important; filter: grayscale(0%) !important; }
+.circuito:hover { filter: brightness(1.3) !important; }
 
-  #tablero-container.hay-seleccion .grupo.activo {
-    opacity: 1;
-    filter: grayscale(0%);
-  }
+.fase-r { background: rgba(220,40,40,0.35);   border: 2px solid rgba(220,40,40,0.9);  }
+.fase-s { background: rgba(80,80,80,0.35);    border: 2px solid rgba(80,80,80,0.9);   }
+.fase-t { background: rgba(0,80,200,0.35);    border: 2px solid rgba(0,100,220,0.9);  }
+.neutro { background: rgba(130,130,130,0.30); border: 2px dashed rgba(160,160,160,0.9); }
 
-  #igbox {
-    opacity: 1 !important;
-    filter: grayscale(0%) !important;
-  }
+.circuito.activo.fase-r { box-shadow: 0 0 14px 3px rgba(220,40,40,0.7);  }
+.circuito.activo.fase-s { box-shadow: 0 0 14px 3px rgba(100,100,100,0.7);}
+.circuito.activo.fase-t { box-shadow: 0 0 14px 3px rgba(0,100,220,0.7);  }
+.circuito.activo.neutro { box-shadow: 0 0 14px 3px rgba(180,180,180,0.7);}
 
-  .circuito:hover {
-    filter: brightness(1.25) !important;
-  }
+/* PANEL FLOTANTE (desktop >= 601px) */
+#info-float {
+  position: absolute;
+  background: rgba(8,10,22,0.96);
+  border: 1px solid rgba(255,255,255,0.13);
+  border-left: 3px solid #aaa;
+  padding: 10px 26px 10px 12px;
+  font-size: 12px;
+  line-height: 1.75;
+  z-index: 20;
+  border-radius: 4px;
+  color: #dce4f0;
+  width: 185px;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 4px 22px rgba(0,0,0,0.55);
+  opacity: 0;
+  transform: translateY(-5px);
+  pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+#info-float.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+#info-float b { display: block; font-size: 11.5px; color: #fff; margin-bottom: 4px; }
+#float-close {
+  position: absolute; top: 5px; right: 7px;
+  background: none; border: none;
+  color: rgba(255,255,255,0.35); font-size: 13px; cursor: pointer;
+}
+#float-close:hover { color: #fff; }
 
-  .fase-r {
-    background-color: rgba(220, 40, 40, 0.35);
-    border: 2px solid rgba(220, 40, 40, 0.9);
-  }
-  .fase-s {
-    background-color: rgba(80, 80, 80, 0.35);
-    border: 2px solid rgba(80, 80, 80, 0.9);
-  }
-  .fase-t {
-    background-color: rgba(0, 80, 200, 0.35);
-    border: 2px solid rgba(0, 100, 220, 0.9);
-  }
-  .neutro {
-    background-color: rgba(130, 130, 130, 0.30);
-    border: 2px dashed rgba(160, 160, 160, 0.9);
-  }
+.fase-tag {
+  display: inline-block; font-size: 10px;
+  padding: 1px 7px; border-radius: 2px;
+  margin-bottom: 6px; font-weight: bold;
+}
+.tag-r { background: rgba(220,40,40,0.22); color: #ff7070; border: 1px solid rgba(220,40,40,0.45); }
+.tag-s { background: rgba(80,80,80,0.22);  color: #aaa;    border: 1px solid rgba(80,80,80,0.45);  }
+.tag-t { background: rgba(0,80,200,0.22);  color: #70a8ff; border: 1px solid rgba(0,80,200,0.45);  }
+.tag-n { background: rgba(130,130,130,0.22); color: #ccc;  border: 1px solid rgba(130,130,130,0.45);}
 
-  .circuito.activo.fase-r  { box-shadow: 0 0 14px 3px rgba(220,40,40,0.7); }
-  .circuito.activo.fase-s  { box-shadow: 0 0 14px 3px rgba(100,100,100,0.7); }
-  .circuito.activo.fase-t  { box-shadow: 0 0 14px 3px rgba(0,100,220,0.7); }
-  .circuito.activo.neutro  { box-shadow: 0 0 14px 3px rgba(180,180,180,0.7); }
+/* DRAWER MOVIL (<= 600px) */
+#drawer-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 199;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+#drawer-overlay.visible { opacity: 1; pointer-events: auto; }
 
-  .info {
-    position: absolute;
-    background: rgba(10, 12, 24, 0.95);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-left: 3px solid;
-    padding: 10px 14px;
-    font-size: clamp(10px, 3vw, 12px);
-    line-height: 1.6;
-    z-index: 20;
-    border-radius: 4px;
-    color: #dce4f0;
-    min-width: 160px;
-    max-width: 220px;
-    backdrop-filter: blur(4px);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-    opacity: 0;
-    transform: translateY(-4px);
-    pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-  }
+#info-drawer {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #0a0c18;
+  border-top: 3px solid #555;
+  padding: 12px 18px 36px;
+  z-index: 200;
+  color: #dce4f0;
+  font-size: 13px;
+  line-height: 1.85;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -6px 32px rgba(0,0,0,0.6);
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.32,0.72,0,1);
+}
+#info-drawer.visible { transform: translateY(0); }
+#drawer-handle { width:36px; height:4px; background:rgba(255,255,255,0.18); border-radius:2px; margin:0 auto 12px; }
+#drawer-titulo  { font-weight:bold; color:#fff; font-size:14px; margin-bottom:6px; }
+#drawer-detalles { color:#b0bcd0; font-size:12px; }
+#drawer-close {
+  position:absolute; top:13px; right:15px;
+  background:none; border:none;
+  color:rgba(255,255,255,0.3); font-size:19px; cursor:pointer;
+}
+#drawer-close:hover { color:#fff; }
 
-  .info.visible {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-  }
+#hint {
+  text-align:center; color:rgba(255,255,255,0.28);
+  font-size:11px; margin-top:10px; letter-spacing:0.1em; transition:opacity 0.5s;
+}
 
-  .info-close {
-    position: absolute;
-    top: 5px;
-    right: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    color: rgba(255,255,255,0.4);
-    background: none;
-    border: none;
-  }
-  .info-close:hover { color: #fff; }
-
-  .fase-tag {
-    display: inline-block;
-    font-size: 0.75em;
-    padding: 1px 6px;
-    border-radius: 2px;
-    margin-bottom: 6px;
-    font-weight: bold;
-  }
-  .tag-r { background: rgba(220,40,40,0.3); color: #ff7070; border: 1px solid rgba(220,40,40,0.5); }
-  .tag-s { background: rgba(80,80,80,0.3); color: #aaa; border: 1px solid rgba(80,80,80,0.5); }
-  .tag-t { background: rgba(0,80,200,0.3); color: #70a8ff; border: 1px solid rgba(0,80,200,0.5); }
-  .tag-n { background: rgba(130,130,130,0.3); color: #ccc; border: 1px solid rgba(130,130,130,0.5); }
-
-  #hint {
-    position: absolute;
-    bottom: -36px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: rgba(255,255,255,0.35);
-    font-size: 11px;
-    white-space: nowrap;
-    transition: opacity 0.5s;
-  }
-
-  @media (max-width: 600px) {
-    .info {
-      min-width: 130px;
-      max-width: 170px;
-      padding: 6px 10px;
-    }
-    h2 {
-      font-size: 0.8rem;
-    }
-  }
+@media (min-width: 601px) { #drawer-overlay, #info-drawer { display:none !important; } }
+@media (max-width: 600px) { #info-float { display:none !important; } }
 </style>
 </head>
-
 <body>
 
 <h2>Tablero General TG — Interactivo</h2>
 
 <div id="tablero-container">
-  <img src="tablero.png" class="tablero-img" alt="Tablero eléctrico TG">
 
-  <!-- IG - Interruptor General -->
-  <div id="igbox" class="circuito grupo neutro" style="top:70px; left:273.42px; width:38.22px; height:45px;" onclick="seleccionar('ig','neutro','igbox')" title="IG"></div>
-  <div id="ig" class="info" style="top:60px; left:320px;">
-    <button class="info-close" onclick="cerrar(event)">✕</button>
-    <span class="fase-tag tag-n">NEUTRO / GENERAL</span>
-    <b>IG — INTERRUPTOR GENERAL</b>
-    Caja moldeada 3×32A<br>
-    Tensión nominal de aislamiento (Ui): 500 V<br>
-    Tensión nominal de impulso (Uimp): 6 kV<br>
-    Poder de ruptura: 42 kA<br>
-    Fases: 3×25 mm² N2XOH<br>
-    Neutro: 1×25 mm² N2XOH<br>
-    Tierra: 1x16mm2 NH-90<br>
+  <img src="tablero.png" class="tablero-img" id="tablero-img" alt="Tablero eléctrico TG">
+
+  <!--
+    data-t / data-l / data-w / data-h = coordenadas a 600px de ancho.
+    Los estilos inline son esos mismos valores como fallback inmediato.
+    El JS los escala al ancho real del contenedor.
+  -->
+
+  <!-- IG -->
+  <div id="igbox" class="circuito grupo neutro"
+       data-t="70" data-l="273.42" data-w="38.22" data-h="45"
+       style="top:70px;left:273.42px;width:38.22px;height:45px;"
+       onclick="seleccionar('igbox')" title="IG"></div>
+
+  <!-- IZQUIERDA: C-1 a C-5 -->
+  <div id="c1box" class="circuito grupo fase-r"
+       data-t="155" data-l="170.52" data-w="35.28" data-h="16"
+       style="top:155px;left:170.52px;width:35.28px;height:16px;"
+       onclick="seleccionar('c1box')" title="C-1"></div>
+
+  <div id="c2box" class="circuito grupo fase-s"
+       data-t="175" data-l="170.52" data-w="35.28" data-h="16"
+       style="top:175px;left:170.52px;width:35.28px;height:16px;"
+       onclick="seleccionar('c2box')" title="C-2"></div>
+
+  <div id="c3box" class="circuito grupo fase-t"
+       data-t="195" data-l="170.52" data-w="35.28" data-h="16"
+       style="top:195px;left:170.52px;width:35.28px;height:16px;"
+       onclick="seleccionar('c3box')" title="C-3"></div>
+
+  <div id="c4box" class="circuito grupo fase-r"
+       data-t="215" data-l="170.52" data-w="35.28" data-h="16"
+       style="top:215px;left:170.52px;width:35.28px;height:16px;"
+       onclick="seleccionar('c4box')" title="C-4"></div>
+
+  <div id="c5box" class="circuito grupo fase-s"
+       data-t="235" data-l="170.52" data-w="35.28" data-h="16"
+       style="top:235px;left:170.52px;width:35.28px;height:16px;"
+       onclick="seleccionar('c5box')" title="C-5"></div>
+
+  <!-- DERECHA: C-6 a C-9 -->
+  <div id="c6box" class="circuito grupo fase-r"
+       data-t="155" data-l="393.96" data-w="35.28" data-h="16"
+       style="top:155px;left:393.96px;width:35.28px;height:16px;"
+       onclick="seleccionar('c6box')" title="C-6"></div>
+
+  <div id="c7box" class="circuito grupo fase-s"
+       data-t="175" data-l="393.96" data-w="35.28" data-h="16"
+       style="top:175px;left:393.96px;width:35.28px;height:16px;"
+       onclick="seleccionar('c7box')" title="C-7"></div>
+
+  <div id="c8box" class="circuito grupo fase-t"
+       data-t="195" data-l="393.96" data-w="35.28" data-h="16"
+       style="top:195px;left:393.96px;width:35.28px;height:16px;"
+       onclick="seleccionar('c8box')" title="C-8"></div>
+
+  <div id="c9box" class="circuito grupo fase-r"
+       data-t="215" data-l="393.96" data-w="35.28" data-h="16"
+       style="top:215px;left:393.96px;width:35.28px;height:16px;"
+       onclick="seleccionar('c9box')" title="C-9"></div>
+
+  <!-- Panel flotante compartido (desktop) -->
+  <div id="info-float">
+    <button id="float-close" onclick="cerrar()">✕</button>
+    <span id="float-tag" class="fase-tag"></span>
+    <b id="float-titulo"></b>
+    <span id="float-detalles"></span>
   </div>
 
-  <!-- LADO IZQUIERDO: C-1 a C-5 -->
-  <div id="c1box" class="circuito grupo fase-r" style="top:155px; left:170.52px; width:35.28px; height:16px;" onclick="seleccionar('c1','fase-r','c1box')" title="C-1"></div>
-  <div id="c1" class="info" style="top:140px; left:50px;">
-    <button class="info-close" onclick="cerrar(event)">✕</button>
-    <span class="fase-tag tag-r">FASE R</span>
-    <b>C-1 — Riel Din</b>
-    2×16A, 2×25A-30mA<br>Poder de ruptura: 6kA<br>Curva de disparo tipo C<br>
-    Fase R: 2.5 mm² NH-90<br>Neutro: 2.5 mm² NH-90<br>Tierra: 2.5 mm² NH-90<br>
-  </div>
+</div>
 
-  <div id="c2box" class="circuito grupo fase-s" style="top:175px; left:170.52px; width:35.28px; height:16px;" onclick="seleccionar('c2','fase-s','c2box')" title="C-2"></div>
-  <div id="c2" class="info" style="top:160px; left:50px;">
-    <button class="info-close" onclick="cerrar(event)">✕</button>
-    <span class="fase-tag tag-s">FASE S</span>
-    <b>C-2 — Riel Din</b>
-    2×16A, 2×25A-30mA<br>Poder de ruptura: 6kA<br>Curva de disparo tipo C<br>
-    Fase S: 2.5 mm² NH-90<br>Neutro: 2.5 mm² NH-90<br>Tierra: 2.5 mm² NH-90<br>
-  </div>
+<div id="hint">Haz clic en un circuito para ver su información</div>
 
-  <div id="c3box" class="circuito grupo fase-t" style="top:195px; left:170.52px; width:35.28px; height:16px;" onclick="seleccionar('c3','fase-t','c3box')" title="C-3"></div>
-  <div id="c3" class="info" style="top:180px; left:50px;">
-    <button class="info-close" onclick="cerrar(event)">✕</button>
-    <span class="fase-tag tag-t">FASE T</span>
-    <b>C-3 — Riel Din</b>
-    2×20A, 2×25A-30mA<br>Poder de ruptura: 6kA<br>Curva de disparo tipo C<br>
-    Fase T: 4 mm² NH-90<br>Neutro: 4 mm² NH-90<br>Tierra: 2.5 mm² NH-90<br>
-  </div>
-
-  <div id="c4box" class="circuito grupo fase-r" style="top:215px; left:170.52px; width:35.28px; height:16px;" onclick="seleccionar('c4','fase-r','c4box')" title="C-4"></div>
-  <div id="c4" class="info" style="top:200px; left:50px;">
-    <button class="info-close" onclick="cerrar(event)">✕</button>
-    <span class="fase-tag tag-r">FASE R</span>
-    <b>C-4 — Riel Din</b>
-    2×20A, 2×25A-30mA<br>Poder de ruptura: 6kA<br>Curva de disparo tipo C<br>
-    Fase R: 4 mm² NH-90<br>Neutro: 4 mm² NH-90<br>Tierra: 2.5 mm² NH-90<br>
-  </div>
-
-  <div id="c5box" class="circuito grupo fase-s" style="top:235px; left:170.52px; width:35.28px; height:16px;" onclick="seleccionar('c5','fase-s','c5box')" title="C-5"></div>
-  <div id="c5" class="info" style="top:220px; left:50px;">
-    <button class="info-close" onclick="cerrar(event)">✕</button>
-    <span class="fase-tag tag-s">FASE S</span>
-    <b>C-5 — Riel Din</b>
-    2×20A, 2×25A-30mA<br>Poder de ruptura: 6kA<br>Curva de disparo tipo C<br>
-    Fase S: 4 mm² NH-90<br>Neutro: 4 mm² NH-90<br>Tierra: 2.5 mm² NH-90<br>
-  </div>
-
-  <!-- LADO DERECHO: C-6 a C-9 -->
-  <div id="c6box" class="circuito grupo fase-r" style="top:155px; left:393.96px; width:35.28px; height:16px;" onclick="seleccionar('c6','fase-r','c6box')" title="C-6"></div>
-  <div id="c6" class="info" style="top:140px; left:440px;">
-    <button class="info-close" onclick="cerrar(event)">✕</button>
-    <span class="fase-tag tag-r">FASE R</span>
-    <b>C-6 — Riel Din</b>
-    2×20A, 2×25A-30mA<br>Poder de ruptura: 6kA<br>Curva de disparo tipo C<br>
-    Fase R: 4 mm² NH-90<br>Neutro: 4 mm² NH-90<br>Tierra: 2.5 mm² NH-90<br>
-  </div>
-
-  <div id="c7box" class="circuito grupo fase-s" style="top:175px; left:393.96px; width:35.28px; height:16px;" onclick="seleccionar('c7','fase-s','c7box')" title="C-7"></div>
-  <div id="c7" class="info" style="top:160px; left:440px;">
-    <button class="info-close" onclick="cerrar(event)">✕</button>
-    <span class="fase-tag tag-s">FASE S</span>
-    <b>C-7 — Riel Din</b>
-    2×20A, 2×25A-30mA<br>Poder de ruptura: 6kA<br>Curva de disparo tipo C<br>
-    Fase S: 4 mm² NH-90<br>Neutro: 4 mm² NH-90<br>Tierra: 2.5 mm² NH-90<br>
-  </div>
-
-  <div id="c8box" class="circuito grupo fase-t" style="top:195px; left:393.96px; width:35.28px; height:16px;" onclick="seleccionar('c8','fase-t','c8box')" title="C-8"></div>
-  <div id="c8" class="info" style="top:180px; left:440px;">
-    <button class="info-close" onclick="cerrar(event)">✕</button>
-    <span class="fase-tag tag-t">FASE T</span>
-    <b>C-8 — Riel Din</b>
-    2×20A, 2×25A-30mA<br>Poder de ruptura: 6kA<br>Curva de disparo tipo C<br>
-    Fase T: 4 mm² NH-90<br>Neutro: 4 mm² NH-90<br>Tierra: 2.5 mm² NH-90<br>
-  </div>
-
-  <div id="c9box" class="circuito grupo fase-r" style="top:215px; left:393.96px; width:35.28px; height:16px;" onclick="seleccionar('c9','fase-r','c9box')" title="C-9"></div>
-  <div id="c9" class="info" style="top:200px; left:440px;">
-    <button class="info-close" onclick="cerrar(event)">✕</button>
-    <span class="fase-tag tag-r">FASE R</span>
-    <b>C-9 — Riel Din</b>
-    2×20A, 2×25A-30mA<br>Poder de ruptura: 6kA<br>Curva de disparo tipo C<br>
-    Fase R: 4 mm² NH-90<br>Neutro: 4 mm² NH-90<br>Tierra: 2.5 mm² NH-90<br>
-  </div>
-
-  <div id="hint">Haz clic en un circuito para ver su información</div>
+<div id="drawer-overlay" onclick="cerrarDrawer()"></div>
+<div id="info-drawer">
+  <div id="drawer-handle"></div>
+  <button id="drawer-close" onclick="cerrarDrawer()">✕</button>
+  <span id="drawer-tag" class="fase-tag"></span>
+  <div id="drawer-titulo"></div>
+  <div id="drawer-detalles"></div>
 </div>
 
 <script>
-  const contenedor = document.getElementById('tablero-container');
-  const hint = document.getElementById('hint');
-  let circuitoActivo = null;
+const DESIGN_W = 600;
+const PANEL_W  = 188; // ancho fijo del panel flotante
 
-  function seleccionar(infoId, fase, boxId) {
-    const mismoClic = (boxId === circuitoActivo);
-    resetear();
-    if (mismoClic) { hint.style.opacity = '1'; return; }
-    contenedor.classList.add('hay-seleccion');
-    document.getElementById(boxId).classList.add('activo');
-    const panel = document.getElementById(infoId);
-    const colores = { 'fase-r':'#dc2828', 'fase-s':'#666666', 'fase-t':'#0064dc', 'neutro':'#aaaaaa' };
-    panel.style.borderLeftColor = colores[fase] || '#ffffff';
-    panel.classList.add('visible');
-    circuitoActivo = boxId;
-    hint.style.opacity = '0';
-  }
+const CIRCUITOS = {
+  igbox: {
+    fase:'neutro', tagClass:'tag-n', tagLabel:'NEUTRO / GENERAL',
+    titulo:'IG — INTERRUPTOR GENERAL',
+    detalles:'Caja moldeada 3×32A<br>Ui: 500 V &mdash; Uimp: 6 kV<br>Poder de ruptura: 42 kA<br>Fases: 3×25 mm² N2XOH<br>Neutro: 1×25 mm² N2XOH<br>Tierra: 1×16 mm² NH-90',
+    info:{ t:58, l:320 }
+  },
+  c1box:{ fase:'fase-r', tagClass:'tag-r', tagLabel:'FASE R', titulo:'C-1 — Riel Din',
+    detalles:'2×16A | 2×25A-30mA<br>Ruptura: 6 kA | Curva tipo C<br>Fase R: 2.5 mm² NH-90<br>Neutro: 2.5 mm² NH-90<br>Tierra: 2.5 mm² NH-90', info:{ t:140, l:0 } },
+  c2box:{ fase:'fase-s', tagClass:'tag-s', tagLabel:'FASE S', titulo:'C-2 — Riel Din',
+    detalles:'2×16A | 2×25A-30mA<br>Ruptura: 6 kA | Curva tipo C<br>Fase S: 2.5 mm² NH-90<br>Neutro: 2.5 mm² NH-90<br>Tierra: 2.5 mm² NH-90', info:{ t:160, l:0 } },
+  c3box:{ fase:'fase-t', tagClass:'tag-t', tagLabel:'FASE T', titulo:'C-3 — Riel Din',
+    detalles:'2×20A | 2×25A-30mA<br>Ruptura: 6 kA | Curva tipo C<br>Fase T: 4 mm² NH-90<br>Neutro: 4 mm² NH-90<br>Tierra: 2.5 mm² NH-90', info:{ t:180, l:0 } },
+  c4box:{ fase:'fase-r', tagClass:'tag-r', tagLabel:'FASE R', titulo:'C-4 — Riel Din',
+    detalles:'2×20A | 2×25A-30mA<br>Ruptura: 6 kA | Curva tipo C<br>Fase R: 4 mm² NH-90<br>Neutro: 4 mm² NH-90<br>Tierra: 2.5 mm² NH-90', info:{ t:200, l:0 } },
+  c5box:{ fase:'fase-s', tagClass:'tag-s', tagLabel:'FASE S', titulo:'C-5 — Riel Din',
+    detalles:'2×20A | 2×25A-30mA<br>Ruptura: 6 kA | Curva tipo C<br>Fase S: 4 mm² NH-90<br>Neutro: 4 mm² NH-90<br>Tierra: 2.5 mm² NH-90', info:{ t:220, l:0 } },
+  c6box:{ fase:'fase-r', tagClass:'tag-r', tagLabel:'FASE R', titulo:'C-6 — Riel Din',
+    detalles:'2×20A | 2×25A-30mA<br>Ruptura: 6 kA | Curva tipo C<br>Fase R: 4 mm² NH-90<br>Neutro: 4 mm² NH-90<br>Tierra: 2.5 mm² NH-90', info:{ t:140, l:438 } },
+  c7box:{ fase:'fase-s', tagClass:'tag-s', tagLabel:'FASE S', titulo:'C-7 — Riel Din',
+    detalles:'2×20A | 2×25A-30mA<br>Ruptura: 6 kA | Curva tipo C<br>Fase S: 4 mm² NH-90<br>Neutro: 4 mm² NH-90<br>Tierra: 2.5 mm² NH-90', info:{ t:160, l:438 } },
+  c8box:{ fase:'fase-t', tagClass:'tag-t', tagLabel:'FASE T', titulo:'C-8 — Riel Din',
+    detalles:'2×20A | 2×25A-30mA<br>Ruptura: 6 kA | Curva tipo C<br>Fase T: 4 mm² NH-90<br>Neutro: 4 mm² NH-90<br>Tierra: 2.5 mm² NH-90', info:{ t:180, l:438 } },
+  c9box:{ fase:'fase-r', tagClass:'tag-r', tagLabel:'FASE R', titulo:'C-9 — Riel Din',
+    detalles:'2×20A | 2×25A-30mA<br>Ruptura: 6 kA | Curva tipo C<br>Fase R: 4 mm² NH-90<br>Neutro: 4 mm² NH-90<br>Tierra: 2.5 mm² NH-90', info:{ t:200, l:438 } },
+};
 
-  function resetear() {
-    document.querySelectorAll('.grupo').forEach(el => el.classList.remove('activo'));
-    document.querySelectorAll('.info').forEach(el => el.classList.remove('visible'));
-    contenedor.classList.remove('hay-seleccion');
-    circuitoActivo = null;
-  }
+const COLOR = { 'fase-r':'#dc2828','fase-s':'#606060','fase-t':'#0064dc','neutro':'#aaaaaa' };
 
-  function cerrar(event) {
-    event.stopPropagation();
-    resetear();
-    hint.style.opacity = '1';
-  }
+const imgEl      = document.getElementById('tablero-img');
+const contenedor = document.getElementById('tablero-container');
+const infoFloat  = document.getElementById('info-float');
+const hint       = document.getElementById('hint');
+let circuitoActivo = null;
 
-  contenedor.addEventListener('click', function(e) {
-    if (!e.target.closest('.circuito') && !e.target.closest('.info')) {
-      resetear();
-      hint.style.opacity = '1';
-    }
+/* ── Escala todas las posiciones al ancho real ── */
+function posicionar() {
+  const w = imgEl.offsetWidth;
+  if (!w) return;
+  const s = w / DESIGN_W;
+
+  document.querySelectorAll('.circuito').forEach(el => {
+    el.style.top    = (el.dataset.t * s) + 'px';
+    el.style.left   = (el.dataset.l * s) + 'px';
+    el.style.width  = (el.dataset.w * s) + 'px';
+    el.style.height = (el.dataset.h * s) + 'px';
   });
-</script>
 
+  if (circuitoActivo) colocarPanel(s, w);
+}
+
+/* ── Posiciona el panel flotante evitando desbordamiento ── */
+function colocarPanel(s, cw) {
+  const c = CIRCUITOS[circuitoActivo]; if (!c) return;
+  s  = s  ?? imgEl.offsetWidth / DESIGN_W;
+  cw = cw ?? imgEl.offsetWidth;
+  let left = c.info.l * s;
+  if (left + PANEL_W > cw - 4) left = cw - PANEL_W - 4;
+  if (left < 2) left = 2;
+  infoFloat.style.left = left + 'px';
+  infoFloat.style.top  = (c.info.t * s) + 'px';
+}
+
+/* ResizeObserver: detecta cambios de tamaño del contenedor */
+new ResizeObserver(posicionar).observe(contenedor);
+imgEl.addEventListener('load',  posicionar);
+imgEl.addEventListener('error', posicionar);
+if (imgEl.complete) posicionar();
+
+/* ── SELECCIÓN ── */
+function seleccionar(boxId) {
+  const mismo = boxId === circuitoActivo;
+  resetear();
+  if (mismo) { hint.style.opacity='1'; return; }
+
+  const c = CIRCUITOS[boxId]; if (!c) return;
+  contenedor.classList.add('hay-seleccion');
+  document.getElementById(boxId).classList.add('activo');
+  circuitoActivo = boxId;
+  hint.style.opacity = '0';
+
+  const color = COLOR[c.fase] || '#fff';
+  window.innerWidth <= 600 ? mostrarDrawer(c, color) : mostrarPanel(c, color);
+}
+
+function mostrarPanel(c, color) {
+  document.getElementById('float-tag').className    = 'fase-tag ' + c.tagClass;
+  document.getElementById('float-tag').textContent   = c.tagLabel;
+  document.getElementById('float-titulo').textContent = c.titulo;
+  document.getElementById('float-detalles').innerHTML = c.detalles;
+  infoFloat.style.borderLeftColor = color;
+  colocarPanel();
+  infoFloat.classList.add('visible');
+}
+
+function mostrarDrawer(c, color) {
+  document.getElementById('drawer-tag').className     = 'fase-tag ' + c.tagClass;
+  document.getElementById('drawer-tag').textContent    = c.tagLabel;
+  document.getElementById('drawer-titulo').textContent  = c.titulo;
+  document.getElementById('drawer-detalles').innerHTML  = c.detalles;
+  document.getElementById('info-drawer').style.borderTopColor = color;
+  document.getElementById('drawer-overlay').classList.add('visible');
+  document.getElementById('info-drawer').classList.add('visible');
+}
+
+function resetear() {
+  document.querySelectorAll('.grupo').forEach(el => el.classList.remove('activo'));
+  contenedor.classList.remove('hay-seleccion');
+  infoFloat.classList.remove('visible');
+  circuitoActivo = null;
+}
+
+function cerrar()       { resetear(); hint.style.opacity='1'; }
+function cerrarDrawer() {
+  document.getElementById('info-drawer').classList.remove('visible');
+  document.getElementById('drawer-overlay').classList.remove('visible');
+  resetear(); hint.style.opacity='1';
+}
+
+contenedor.addEventListener('click', e => {
+  if (!e.target.closest('.circuito') && !e.target.closest('#info-float')) {
+    resetear(); hint.style.opacity='1';
+  }
+});
+</script>
 </body>
 </html>
